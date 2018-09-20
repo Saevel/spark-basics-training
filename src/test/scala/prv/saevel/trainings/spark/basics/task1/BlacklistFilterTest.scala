@@ -19,9 +19,9 @@ class BlacklistFilterTest extends WordSpec with Matchers with SparkTestSupport w
     balance <- balanceGenerator
   } yield Customer(id, name, surname, age, balance)))
 
-  private val correctCustomers = customers(Gen.choose(18, 30), Gen.choose(15000, Double.MaxValue))
+  private val correctCustomers = customers(Gen.choose(18, 29), Gen.choose(15001, Double.MaxValue))
 
-  private val incorrectCustomers = customers(Gen.choose(31, 100), Gen.choose(-15000, 15000))
+  private val incorrectCustomers = customers(Gen.choose(30, 100), Gen.choose(-15000, 15000))
 
   "BlacklistFiler" when {
 
