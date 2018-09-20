@@ -29,30 +29,24 @@ class BlacklistFilterTest extends WordSpec with Matchers with SparkTestSupport w
 
       "deserialize Customers, filter out those above 30 and below 15000$ as well as remove blacklisted ones" in {
 
-        withSparkContext("BlacklistFilterTest"){ implicit sparkContext =>
+        forOneOf(correctCustomers, incorrectCustomers){ (correct, incorrect) =>
 
-          forOneOf(correctCustomers, incorrectCustomers){ (correct, incorrect) =>
+          implicit val sparkContext = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("BlacklistFilterTest"))
 
-            val sparkContext = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("BlacklistFilterTest"))
+          val allCustomersRDD = sparkContext.parallelize(correct ++ incorrect)
 
-            val allCustomersRDD = sparkContext.parallelize(correct ++ incorrect)
+          val blacklisted = allCustomersRDD.sample(false, 0.3)
 
-            val blacklisted = allCustomersRDD.sample(false, 0.3)
+          val allCustomersCsv = allCustomersRDD.map(c => s"${c.id}, ${c.name}, ${c.surname}, ${c.age}, ${c.accountBalance}")
+          val blacklistedCsv = blacklisted.map(c => s"${c.id}, ${c.name}, ${c.surname}, ${c.age}, ${c.accountBalance}")
 
-            val allCustomersCsv = allCustomersRDD.map(toCsv)
-            val blacklistedCsv = blacklisted.map(toCsv)
+          val results = BlacklistFilter(allCustomersCsv, blacklistedCsv).collect
 
-            val results = BlacklistFilter(allCustomersCsv, blacklistedCsv).collect
+          val expectedResults = sparkContext.parallelize(correct).subtract(blacklisted).collect
 
-            val expectedResults = sparkContext.parallelize(correct).subtract(blacklisted).collect
-
-            results should contain theSameElementsAs(expectedResults)
-          }
+          results should contain theSameElementsAs(expectedResults)
         }
       }
     }
   }
-
-  private def toCsv(customer: Customer): String =
-    List(customer.id, customer.name, customer.surname, customer.age, customer.accountBalance).mkString(", ")
 }
