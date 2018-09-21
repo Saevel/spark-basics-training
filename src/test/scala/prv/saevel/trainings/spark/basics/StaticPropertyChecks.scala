@@ -1,4 +1,4 @@
-package prv.saevel.trainings.spark.basics.task1
+package prv.saevel.trainings.spark.basics
 
 import org.scalacheck.Gen
 import org.scalatest.TestSuite
