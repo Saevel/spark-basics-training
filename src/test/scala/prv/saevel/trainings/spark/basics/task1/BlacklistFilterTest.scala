@@ -5,7 +5,7 @@ import org.junit.runner.RunWith
 import org.scalacheck.Gen
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.junit.JUnitRunner
-import prv.saevel.trainings.spark.basics.Customer
+import prv.saevel.trainings.spark.basics.{SparkTestSupport, StaticPropertyChecks}
 
 @RunWith(classOf[JUnitRunner])
 class BlacklistFilterTest extends WordSpec with Matchers with SparkTestSupport with StaticPropertyChecks {

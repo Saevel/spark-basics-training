@@ -1,4 +1,4 @@
-package prv.saevel.trainings.spark.basics.task1
+package prv.saevel.trainings.spark.basics
 
 import org.apache.spark.{SparkConf, SparkContext}
 
