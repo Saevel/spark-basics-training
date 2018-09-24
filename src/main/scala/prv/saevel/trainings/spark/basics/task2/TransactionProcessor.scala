@@ -31,14 +31,11 @@ object TransactionProcessor {
       )
     }.map {case(_, (account, _)) => account}.cache
 
-    val debitedCustomerIds = accounts
-      .subtract(suspiciousAccounts)
+    val debitedCustomerIds = accounts.subtract(suspiciousAccounts)
       .groupBy(_.customerId)
-      .mapValues(_.map(_.balance))
-      .mapValues(_.fold(0.0)(_ + _))
+      .mapValues(_.map(_.balance).fold(0.0)(_ + _))
       .filter{ case (_, balance) => balance < 0.0}
-      .map{ case (customerId, _) => customerId}
-      .distinct
+      .map { case (customerId, _) => customerId}
 
     val suspiciousCustomerIds = customers.join(suspiciousAccounts.keyBy(_.customerId))
       .cache

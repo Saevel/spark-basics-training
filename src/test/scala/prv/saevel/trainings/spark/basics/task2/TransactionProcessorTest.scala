@@ -102,7 +102,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
         nonSuspicious.foreach{case (customer, accountsWithTransactions) =>
           allCustomers = allCustomers :+ customer
 
-          val credit = accountsWithTransactions.map(_._1.balance).fold(0.0)(_ + _)
+          val credit = accountsWithTransactions.map{ case (account, _) => account.balance}.fold(0.0)(_ + _)
 
           if(credit < 0.0){
             customersWithDebit = customersWithDebit :+ customer
