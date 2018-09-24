@@ -1,5 +1,7 @@
 package prv.saevel.trainings.spark.basics.task2
 
+import java.nio.file.{Files, Paths}
+
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
 import org.scalacheck.Gen
@@ -27,6 +29,9 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
   private val maxTransactionPerAccount = 20
 
   before {
+
+    Files.createDirectories(Paths.get(System.getProperty("user.dir")).resolve("target"))
+
     deleteDirectoryIfExists(config.accountsFile)
     deleteDirectoryIfExists(config.customersFile)
     deleteDirectoryIfExists(config.transactionsFile)
