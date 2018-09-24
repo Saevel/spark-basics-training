@@ -31,18 +31,30 @@ object TransactionProcessor {
       )
     }.map {case(_, (account, _)) => account}.cache
 
-    val debitedAccounts = accounts.subtract(suspiciousAccounts).filter(_.balance < 0.0)
+    val debitedCustomerIds = accounts
+      .subtract(suspiciousAccounts)
+      .groupBy(_.customerId)
+      .mapValues(_.map(_.balance))
+      .mapValues(_.fold(0.0)(_ + _))
+      .filter{ case (_, balance) => balance < 0.0}
+      .map{ case (customerId, _) => customerId}
+      .distinct
 
-    customers.join(debitedAccounts.keyBy(_.customerId))
+    val suspiciousCustomerIds = customers.join(suspiciousAccounts.keyBy(_.customerId))
       .cache
       .map{ case (_, (customer, _)) => customer.id.toString}
       .distinct
-      .saveAsTextFile(config.suspiciousCustomersFile)
 
+    debitedCustomerIds.saveAsTextFile(config.customersWithDebitFile)
+
+    suspiciousCustomerIds.saveAsTextFile(config.suspiciousCustomersFile)
+
+    /*
     customers.join(debitedAccounts.keyBy(_.customerId))
       .cache
       .map{ case (_, (customer, _)) => customer.id.toString}
       .distinct
       .saveAsTextFile(config.customersWithDebitFile)
+      */
   }
 }
