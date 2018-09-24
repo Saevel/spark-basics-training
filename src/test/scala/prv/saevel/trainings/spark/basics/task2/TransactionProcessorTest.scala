@@ -20,6 +20,8 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
     "target/debits"
   )
 
+  private val ids2: Gen[Long] = Gen.choose(0, 999)
+
   private val ids: Gen[Long] = Gen.choose(100000, 999999)
 
   private val customerCount = 100
@@ -50,7 +52,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
                               transactionsPerAccounts: Int,
                               transactionsGenerator: (Int, Gen[Long]) => Gen[List[Transaction]]): Gen[List[(Account, List[Transaction])]] =
     Gen.listOfN(accountsPerCustomer, for {
-      accountId <- ids
+      accountId <- ids2
       transactions <- transactionsGenerator(transactionsPerAccounts, Gen.const(accountId))
       customerId <- customerIdGeneraotr
     } yield (Account(accountId, customerId, balanceFromTransactions(transactions)), transactions))
@@ -74,7 +76,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
   } yield (Customer(id, name, surname), accounts))
 
   private val nonSuspiciousCustomers: Gen[List[(Customer, List[(Account, List[Transaction])])]] = Gen.listOfN(customerCount, for {
-    id <- ids
+    id <- ids2
     accounts <- nonSuspiciousAccounts(Gen.const(id), maxAccountsPerCustomer, maxTransactionPerAccount, transactions(_, _))
     name <- Gen.alphaStr
     surname <- Gen.alphaStr
@@ -85,7 +87,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
 
     "given a mixture of 'suspicious', 'with debit' and other Customers" should {
 
-      "save 'suspicious' ones ids to one file and 'with debit' ones to another file" in forOneOf(nonSuspiciousCustomers, suspiciousCustomers) { (suspicious, nonSuspicious) =>
+      "save 'suspicious' ones ids to one file and 'with debit' ones to another file" in forOneOf(nonSuspiciousCustomers, suspiciousCustomers) { (nonSuspicious, suspicious) =>
 
         var suspiciousCustomers: List[Customer] = List.empty
         var customersWithDebit: List[Customer] = List.empty
