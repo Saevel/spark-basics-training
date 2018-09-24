@@ -24,11 +24,11 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
 
   private val ids: Gen[Long] = Gen.choose(100000, 999999)
 
-  private val customerCount = 100
+  private val customerCount = 5
 
-  private val maxAccountsPerCustomer = 10
+  private val maxAccountsPerCustomer = 2
 
-  private val maxTransactionPerAccount = 20
+  private val maxTransactionPerAccount = 4
 
   before {
 
