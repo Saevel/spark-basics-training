@@ -125,7 +125,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with StaticPropert
         val detectedSuspicious = sparkContext.textFile(config.suspiciousCustomersFile).map(_.toLong).collect
         val detectedDebits = sparkContext.textFile(config.customersWithDebitFile).map(_.toLong).collect
 
-        // detectedSuspicious should contain theSameElementsAs(suspiciousCustomers.map(_.id))
+        detectedSuspicious should contain theSameElementsAs(suspiciousCustomers.map(_.id))
         detectedDebits should contain theSameElementsAs(customersWithDebit.map(_.id))
       }
     }
